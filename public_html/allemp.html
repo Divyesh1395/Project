@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>All Employee</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body onload="load()">
+        <div>All Employee Details</div>
+        
+        
+        <script>
+
+            function createGETALLRecordRequest(token, dbName, relName, pageNo, pageSize, createTime, updateTime) {
+            if (createTime !== undefined) {
+            if (createTime !== true) {
+            createTime = false;
+            }
+            } else {
+            createTime = false;
+            }
+            if (updateTime !== undefined) {
+            if (updateTime !== true) {
+            updateTime = false;
+            }
+            } else {
+            updateTime = false;
+            }
+            var req = "{\n"
+                    + "\"token\" : \""
+                    + token
+                    + "\","
+                    + "\"dbName\": \""
+                    + dbName
+                    + "\",\n" + "\"cmd\" : \"GETALL\",\n"
+                    + "\"rel\" : \""
+                    + relName
+                    + "\",\n" + "\"pageNo\":"
+                    + pageNo
+                    + "," + "\"pageSize\":"
+                    + pageSize
+                    + "\,"
+                    + "\"createTime\":"
+                    + createTime
+                    + "\,"
+                    + "\"updateTime\":"
+                    + updateTime
+                    + "\n"
+                    + "}";
+            return req;
+            }
+
+            function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+            var url = dbBaseUrl + apiEndPointUrl;
+            var jsonObj;
+            $.post(url, reqString, function (result) {
+            jsonObj = JSON.parse(result);
+            }).fail(function (result) {
+            var dataJsonObj = result.responseText;
+            //jsonObj = JSON.parse(dataJsonObj);
+            });
+            return jsonObj;
+            }
+
+            function load() {
+            var getReqStr = createGETALLRecordRequest("90936144|-31948850532678496|90944252",
+                    "Organisation", "Employee_Rel", 1, 10,true,true);
+            jQuery.ajaxSetup({async: false});
+            var resultObj = executeCommand(getReqStr,
+                    "http://api.login2explore.com:5577", "/api/irl");
+            jQuery.ajaxSetup({async: true});
+            alert(JSON.stringify(resultObj));
+           
+            }
+           
+        </script>
+    </body>
+</html>

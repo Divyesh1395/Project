@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en">
+    <head>
+        <title>Admin Panel</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Admin Panel : </h2>
+            <form id="empForm" method="post">
+                <div class="form-group">
+                    <label for="adminEmail">Email:</label>
+                    <input type="email" class="form-control" id="adminEmail"
+                           placeholder="Enter Email ID" name="adminEmail">
+                </div>
+                <div class="form-group">
+                    <label for="pass">Password:</label>
+                    <input type="text" class="form-control" id="pass"
+                           placeholder="Enter Password" name="pass">
+                </div>
+                <input type="button" class="btn btn-primary" id="adminLogin" value="Login"
+                       onclick="login();">
+            </form>
+        </div>
+
+        <script>
+
+            $("#adminEmail").focus();
+            var passVar;
+
+            function validateAndGetFormData() {
+                var adminIdVar = $("#adminEmail").val();
+                if (adminIdVar === "") {
+                    alert("Email ID Required");
+                    $("#adminEmail").focus();
+                    return "";
+                }
+                passVar = $("#pass").val();
+                if (passVar === "") {
+                    alert("Password is Required");
+                    $("#pass").focus();
+                    return "";
+                }
+                var jsonStrObj = {
+                    email: adminIdVar
+                };
+                return JSON.stringify(jsonStrObj);
+            }
+
+            function createGETRequest(connToken, jsonObj, dbName, relName) {
+                var getRequest = "{\n"
+                        + "\"token\" : \""
+                        + connToken
+                        + "\","
+                        + "\"dbName\": \""
+                        + dbName
+                        + "\",\n" + "\"cmd\" : \"GET\",\n"
+                        + "\"rel\" : \""
+                        + relName + "\","
+                        + "\"jsonStr\": \n"
+                        + jsonObj
+                        + "\n"
+                        + "}";
+                return getRequest;
+            }
+            
+            function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+                var url = dbBaseUrl + apiEndPointUrl;
+                var jsonObj;
+                $.post(url, reqString, function (result) {
+                    jsonObj = JSON.parse(result);
+                }).fail(function (result) {
+                    var dataJsonObj = result.responseText;
+                    jsonObj = JSON.parse(dataJsonObj);
+                });
+                return jsonObj;
+            }
+
+            function login() {
+                var jsonStr = validateAndGetFormData();
+                if (jsonStr === "") {
+                    return;
+                }
+                var getReqStr = createGETRequest("90936144|-31948850532678496|90944252",
+                        jsonStr, "Organisation", "HR_Rel");
+                
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommand(getReqStr,
+                        "http://api.login2explore.com:5577", "/api/irl");
+                jQuery.ajaxSetup({async: true});
+                
+                var getPass = (JSON.parse(resultObj.data)).password;
+                
+                if(getPass === passVar)
+                    window.location.replace("dashboard.html");
+                else alert("Invalid Credentials");
+
+                }
+
+        </script>
+    </body>
+</html>
+
